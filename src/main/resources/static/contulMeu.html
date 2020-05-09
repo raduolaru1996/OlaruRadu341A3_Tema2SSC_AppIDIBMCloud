@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Spring Boot App ID Sample</title>
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css"/>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+		<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+		<!------ Include the above in your HEAD tag ---------->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css"/>
+        <script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="/webjars/js-cookie/js.cookie.js"></script>
+        <script type="text/javascript">
+            $.ajaxSetup({
+                beforeSend : function(xhr, settings) {
+                    if (settings.type == 'POST' || settings.type == 'PUT' || settings.type == 'DELETE' || settings.type == 'GET') {
+                        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                            // Only send the token to relative URLs i.e. locally.
+                            xhr.setRequestHeader("X-XSRF-TOKEN", Cookies.get('XSRF-TOKEN'));
+                        }
+                        xhr.setRequestHeader("X-XSRF-TOKEN", Cookies.get('XSRF-TOKEN'));
+                    }
+                }
+            });
+            
+            $.get("/user", function(data) {
+            	var blocare = "";
+            	var logout = "";
+                if (data.principal != null) {
+                    $("#user").html(data.principal.attributes.given_name);
+                    $("#userSub").html(data.principal.attributes.sub);
+                    $("#userEmail").html(data.principal.attributes.email);
+                    
+                    if(data.principal.attributes.picture != null){
+                    	$("#userPicture").html("<br><br><img src=\""+data.principal.attributes.picture+"\">");
+                    }
+                    
+                    $("#userAmr").html(data.principal.attributes.amr[0]);
+                    $("#provider").html(data.principal.attributes.identities[0].provider);
+                    blocare = "\"href=\"/contulMeu\">";
+                    logout = "<a class=\"nav-item nav-link active\" href=\"/logout\">Logout <span class=\"sr-only\"></span></a>";
+                    $(".unauthenticated").hide();
+                    $(".authenticated").show();
+                } else {
+                	blocare = " disabled\"href=\"/contulMeu\">";
+                    $(".unauthenticated").show();
+                    $(".authenticated").hide();
+                }
+                $("#butonCont").html("<a class=\"nav-item nav-link" + blocare + "Contul Meu</a>");
+                $("#butonLogout").html(logout);
+            }).fail(function() {
+                $(".unauthenticated").show();
+                $(".authenticated").hide();
+            });
+            $.get("/userInfo", function(data) {
+                if (data.includes("Principal")) {
+                    $("#userInfoString").html(data);
+                    $(".unauthenticated").hide();
+                    $(".authenticated").show();
+                } else {
+                    $(".unauthenticated").show();
+                    $(".authenticated").hide();
+                }
+            }).fail(function() {
+                $(".unauthenticated").show();
+                $(".authenticated").hide();
+            });
+        </script>
+    </head>
+	<body>
+		<nav class="navbar navbar-expand-lg navbar-light bg-light">
+			<a class="navbar-brand" href="/">AppID Autentificare Securizata</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+				<div class="navbar-nav">
+					<a class="nav-item nav-link" href="/">Home <span class="sr-only"></span></a>
+					<span class="active" id="butonCont">(current)</span>
+					<span id="butonLogout"></span>
+					<a class="nav-item nav-link disabled navbar-right" href="/">Radu Olaru 341A3<span class="sr-only"></span></a>
+				</div>
+			</div>
+		</nav>
+
+        <div class="container authenticated" style="text-align: center;" >
+        	<div class="jumbotron">
+			  <h1 class="display-4"><strong>Bine ai venit <span id="user"></span>!</strong></h1>
+			  <p class="lead">Informatii suplimentare despre contul tau:</p>
+			  <span id="userPicture"></span>
+			  <br><br><br>
+			  	<ul class="list-group">
+				  <li class="list-group-item"><strong>ID in cloud: </strong><span id="userSub"></span></li>
+				  <li class="list-group-item"><strong>Contul se afla: </strong><span id="userAmr"></span></li>
+				  <li class="list-group-item"><strong>Email: </strong><span id="userEmail"></span></li>
+				  <li class="list-group-item"><strong>Provider: </strong><span id="provider"></span></li>
+				</ul>
+	            <button class="btn btn-primary btn-lg" data-toggle="collapse" data-target="#demo"><strong>Informatii Suplimentare</strong></button>
+
+				<div id="demo" class="collapse">
+				<span id="userInfoString"></span>
+				</div>
+				    
+	            <br>
+	            <span id="userInfoString"></span>
+			  <hr class="my-4">
+			  <p>Daca vrei sa te deconectezi foloseste butonul Logout</p>
+			  <p class="lead">
+			    <a class="btn btn-primary btn-lg" href="/logout" role="button">Logout</a>
+			  </p>
+			</div>
+       </div>
+    </body>

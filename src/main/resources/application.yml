@@ -1,0 +1,10 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          appid:
+            clientId: "8d51b6ef-982c-4053-8849-828f322e8800"
+            clientSecret: "ZjZkOTBlZDAtOWJlZC00ODQxLWI1MzUtMTFjY2NiZWI0ZjZl"
+            region: "London"
+            tenantId: "5244a4dd-6bde-438c-ab76-0ea172eff0ca"
